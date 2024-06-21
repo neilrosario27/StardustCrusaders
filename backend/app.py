@@ -7,6 +7,7 @@ import json
 from openai import OpenAI
 from langchain.chat_models import ChatOpenAI
 import PyPDF2 as pdf
+import re
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -66,8 +67,7 @@ def generate_flowchart():
 
 
 
-#mcq
-
+#mcq done
 
 @app.route('/getmcq/', methods=['POST'])
 def mcq():
@@ -128,18 +128,12 @@ def get_mcq(topic, number):
 
 
 
-#resume
-
-# @app.after_request
-# def after_request(response):
-#     response.headers.add('Access-Control-Allow-Origin', '*')
-#     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-#     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-#     return response
+# resume done
 
 def get_gemini_response(input):
     # Assuming genai.GenerativeModel and related configurations are correctly set up
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('gemini-1.5-flash',
+                              generation_config={"response_mime_type": "application/json"})
     response = model.generate_content(input)
     return response.text
 
@@ -152,9 +146,9 @@ def input_pdf_text(uploaded_file):
     return text
 
 # Prompt Template (assuming it's defined as before)
-input_prompt = """
+input_prompt="""
 Hey Act Like a skilled or very experience ATS(Application Tracking System)
-with a deep understanding of tech field,software engineering,data science,data analyst
+with a deep understanding of tech field,software engineering,data science ,data analyst
 and big data engineer. Your task is to evaluate the resume based on the given job description.
 You must consider the job market is very competitive and you should provide 
 best assistance for improving thr resumes. Assign the percentage Matching based 
@@ -163,11 +157,83 @@ the missing keywords with high accuracy
 resume:{text}
 description:{jd}
 
-I want the response in 3 strings having the structure
-1.JD Match:% 
-2.MissingKeywords:[] 
-3.Profile Summary:
+I want the response Using this JSON schema:
+response = ("JD Match":percentage score ,"Missing Keywords:[]","Profile Summary": summary)
+
 """
+
+
+
+jd_prompt="""
+Hey Act Like a skilled or very experience ATS(Application Tracking System)
+with a deep understanding of tech field,software engineering,data science ,data analyst
+and big data engineer. Your task is to evaluate the resume based on the given job description.
+You must consider the job market is very competitive and you should provide 
+best assistance for improving thr resumes. Assign the percentage Matching based 
+on Jd and
+the missing keywords with high accuracy
+resume:{text}
+description:{jd}
+
+I want the response Using this JSON schema:
+response = ("JD Match":percentage score)
+
+"""
+
+
+missing_prompt="""
+Hey Act Like a skilled or very experience ATS(Application Tracking System)
+with a deep understanding of tech field,software engineering,data science ,data analyst
+and big data engineer. Your task is to evaluate the resume based on the given job description.
+You must consider the job market is very competitive and you should provide 
+best assistance for improving thr resumes. Find
+the missing keywords with high accuracy
+resume:{text}
+description:{jd}
+
+I want the response Using this JSON schema:
+response = ("Missing Keywords:[]")
+
+"""
+
+
+summary_prompt="""
+Hey Act Like a skilled or very experience ATS(Application Tracking System)
+with a deep understanding of tech field,software engineering,data science ,data analyst
+and big data engineer. Your task is to evaluate the resume based on the given job description.
+You must consider the job market is very competitive and you should provide 
+best assistance for improving the resumes. Give Profile Summary
+resume:{text}
+description:{jd}
+
+I want the response Using this JSON schema:
+response = ("Profile Summary": summary)
+
+"""
+
+def JD_Score(jd, text):
+    input_text = jd_prompt.replace('{text}', text).replace('{jd}', jd)
+    response = get_gemini_response(input_text)
+    # print(response)
+
+    return response
+
+def Missing(jd, text):
+    input_text = missing_prompt.replace('{text}', text).replace('{jd}', jd)
+    response = get_gemini_response(input_text)
+    # print(response)
+
+    return response
+
+
+def Summary(jd, text):
+    input_text = summary_prompt.replace('{text}', text).replace('{jd}', jd)
+    response = get_gemini_response(input_text)
+    # print(response)
+
+    return response
+
+
 
 @app.route('/resume', methods=['POST'])
 def index():
@@ -175,9 +241,26 @@ def index():
     uploaded_file = request.files['uploaded_file']
     text = input_pdf_text(uploaded_file)
     input_text = input_prompt.replace('{text}', text).replace('{jd}', jd)
-    response = get_gemini_response(input_text)
-    print(response)
-    return jsonify(response=response)  # Return JSON response
+
+    
+    jds = JD_Score(jd, text)
+    print("jd ===>", jds)
+
+    missing = Missing(jd, text)
+    print("missing ==>", missing)
+
+    summary = Summary(jd, text)
+    print("summary ==>", summary)
+
+    jdsnew = remove_brackets(jds)
+    missingnew = remove_brackets(missing)
+    summarynew = remove_brackets(summary)
+
+    print("new ===>",jdsnew, missingnew, summarynew)
+    return jsonify(jds=jdsnew, missing=missingnew, summary=summarynew)
+
+def remove_brackets(input_string):
+    return re.sub(r'[{}"]', '', input_string)
 
 
 

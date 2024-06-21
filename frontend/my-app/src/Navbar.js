@@ -1,13 +1,24 @@
 import React from "react";
-import "./Navbar.css"; // Assuming you will add some CSS styling later
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <nav className="navbar">
-      <button className="nav-button">1</button>
-      <button className="nav-button">2</button>
-      <button className="nav-button">3</button>
-      <button className="nav-button">4</button>
+    <nav className="flex justify-around bg-gray-800 p-4">
+      <Link
+        to="/flowchart"
+        className="bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300"
+      >
+        Flowchart
+      </Link>
+      <button className="bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300">
+        2
+      </button>
+      <button className="bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300">
+        3
+      </button>
+      <button className="bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300">
+        4
+      </button>
     </nav>
   );
 };

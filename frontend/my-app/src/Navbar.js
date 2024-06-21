@@ -17,12 +17,12 @@ const Navbar = () => {
         Resume
       </Link>
 
-      <button
+      <Link
+        to="/questions"
         className="bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300"
-        href="http://localhost:5173/mcqquiz"
       >
-        3
-      </button>
+        DSA
+      </Link>
       <a href="http://localhost:5173/mcqquiz" >Quiz</a>
       <a href="http://localhost:3001" >Calendar</a>
       <button className="bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300">

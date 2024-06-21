@@ -1,12 +1,10 @@
-
-
 import React, { useState } from "react";
 import axios from "axios";
 
 const Resume = () => {
   const [jd, setJd] = useState("");
   const [file, setFile] = useState(null);
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState(null); // Initialize response state
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -26,7 +24,7 @@ const Resume = () => {
         },
       });
 
-      setResponse(res.data.response); // Assuming response structure is { response: '...' }
+      setResponse(res.data); // Assuming response structure matches what Flask backend sends
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -77,15 +75,19 @@ const Resume = () => {
           </div>
         </form>
         {response && (
-          <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-gray-900">Response:</h2>
-            <p className="mt-2 text-gray-600">{response}</p>
-          </div>
-        )}
+  <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
+    <h2 className="text-lg font-semibold text-gray-900">Response:</h2>
+    <p className="mt-4 text-lg text-gray-600">{response.jds}</p>
+    <p className="my-4 text-lg text-gray-600">{response.missing}</p>
+    <p className="mb-4 text-lg text-gray-600">{response.summary}</p>
+  </div>
+)}
+
       </div>
     </div>
   );
 };
 
 export default Resume;
+
 

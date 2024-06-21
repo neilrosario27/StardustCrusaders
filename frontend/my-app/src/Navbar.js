@@ -10,9 +10,12 @@ const Navbar = () => {
       >
         Flowchart
       </Link>
-      <button className="bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300">
-        2
-      </button>
+      <Link
+        to="/resume"
+        className="bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300"
+      >
+        Resume
+      </Link>
       <button className="bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300">
         3
       </button>

@@ -3,12 +3,22 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import json
+from openai import OpenAI
+from langchain.chat_models import ChatOpenAI
+import PyPDF2 as pdf
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+
+
+#flowchart
 
 def ask_gemini(user_question, user_experience):
     model = genai.GenerativeModel('gemini-pro')
@@ -48,6 +58,128 @@ def generate_flowchart():
         'original_response': raw_gemini_response,
         'steps': detailed_responses
     })
+
+
+
+
+
+
+
+
+#mcq
+
+
+@app.route('/getmcq/', methods=['POST'])
+def mcq():
+    try:
+        # Retrieving data from the form
+        topic = request.form.get('topic')
+        number = int(request.form.get('number'))
+
+        if number <= 0:
+            return jsonify({"message": "Invalid number of questions, please enter number greater than 0"}), 500
+
+        # Assuming get_mcq is a function that retrieves MCQ data
+        result = get_mcq(topic, number)
+        data = json.loads(result)
+
+        formatted = []
+        for question_ob in data:
+            question = question_ob["question"]
+            answer = question_ob["answer"]
+            options = [question_ob["option1"], question_ob["option2"], question_ob["option3"]]
+            formatted_question = {
+                "question": question,
+                "answer": answer,
+                "options": options
+            }
+            formatted.append(formatted_question)
+
+        return jsonify(formatted), 200
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"success": False, "message": "Can't generate these many MCQs"}), 500
+
+
+
+def get_mcq(topic, number):
+    # docs = vectorstore.similarity_search(topic)
+    client = OpenAI(api_key=OPENAI_API_KEY)
+    questions = []
+    for i in range(0, number, 1):
+        response = client.chat.completions.create(
+        model="gpt-3.5-turbo-0125",
+        response_format={ "type": "json_object" },
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
+            {"role": "system", "content": "Always follow this format (questions : Question generated, answer : correct answer, option1: wrong option , option2 : wrong option, option3: wrong options).\n"},
+            {"role": "user", "content": f"{topic}\n Generate one mcq questions from the above topic. Don't repeat these questions: \n{questions}\n Keep in mind that the generated options should not be more than 15 words. The difficulty of questions hould be moderate."}
+        ]
+        )
+        questions.append(response.choices[0].message.content)  
+    print(questions)
+    json_responses = [json.loads(response) for response in questions]
+    fin2 = json.dumps(json_responses, indent=4)
+    parsed_json = json.loads(fin2)
+    minimized_json_string = json.dumps(parsed_json, separators=(',', ':'))
+    print(minimized_json_string)
+    return minimized_json_string                 
+
+
+
+#resume
+
+# @app.after_request
+# def after_request(response):
+#     response.headers.add('Access-Control-Allow-Origin', '*')
+#     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+#     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+#     return response
+
+def get_gemini_response(input):
+    # Assuming genai.GenerativeModel and related configurations are correctly set up
+    model = genai.GenerativeModel('gemini-pro')
+    response = model.generate_content(input)
+    return response.text
+
+def input_pdf_text(uploaded_file):
+    reader = pdf.PdfReader(uploaded_file)
+    text = ""
+    for page in range(len(reader.pages)):
+        page = reader.pages[page]
+        text += str(page.extract_text())
+    return text
+
+# Prompt Template (assuming it's defined as before)
+input_prompt = """
+Hey Act Like a skilled or very experience ATS(Application Tracking System)
+with a deep understanding of tech field,software engineering,data science,data analyst
+and big data engineer. Your task is to evaluate the resume based on the given job description.
+You must consider the job market is very competitive and you should provide 
+best assistance for improving thr resumes. Assign the percentage Matching based 
+on Jd and
+the missing keywords with high accuracy
+resume:{text}
+description:{jd}
+
+I want the response in 3 strings having the structure
+1.JD Match:% 
+2.MissingKeywords:[] 
+3.Profile Summary:
+"""
+
+@app.route('/resume', methods=['POST'])
+def index():
+    jd = request.form['jd']
+    uploaded_file = request.files['uploaded_file']
+    text = input_pdf_text(uploaded_file)
+    input_text = input_prompt.replace('{text}', text).replace('{jd}', jd)
+    response = get_gemini_response(input_text)
+    print(response)
+    return jsonify(response=response)  # Return JSON response
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

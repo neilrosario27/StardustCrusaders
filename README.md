@@ -68,3 +68,26 @@
     npm start
     ```
 
+# Interview
+
+
+1. Navigate to the project directory:
+    ```sh
+    cd gen-ai-project\frontend\gen-ai
+  
+    ```
+
+2. Install the project dependencies:
+    ```sh
+    npm install
+    ```
+
+
+3. Start the development server:
+    ```sh
+    npm run dev
+    ```
+
+
+
+

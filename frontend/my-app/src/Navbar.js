@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { FaSitemap, FaFileAlt, FaCentercode, FaCalendarAlt, FaQuora, FaHome, FaYoutube } from 'react-icons/fa';
+import { FaSitemap, FaFileAlt, FaCentercode, FaCalendarAlt, FaQuora, FaHome, FaYoutube, faMicrophone, faTextHeight } from 'react-icons/fa';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -61,7 +61,16 @@ const Navbar = () => {
             </a>
           </li>
           <li>
-            <button className="sidebar-button" onClick={closeSidebar}>Interview Simulator</button>
+            <a href="http://localhost:3002/text" className="sidebar-button" onClick={closeSidebar}>
+              <FaYoutube className="icon" />
+              Text Interview
+            </a>
+          </li>
+          <li>
+            <a href="http://localhost:3002/audio2" className="sidebar-button" onClick={closeSidebar}>
+              <FaYoutube className="icon" />
+              Audio Interview
+            </a>
           </li>
         </ul>
       </nav>

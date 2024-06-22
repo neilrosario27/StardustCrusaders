@@ -8,6 +8,9 @@ from openai import OpenAI
 from langchain.chat_models import ChatOpenAI
 import PyPDF2 as pdf
 import re
+from openai import OpenAI
+from langchain_community.chat_models import ChatOpenAI
+
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -17,48 +20,118 @@ genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-
+client = OpenAI(api_key = OPENAI_API_KEY)
 
 #flowchart
 
-def ask_gemini(user_question, user_experience):
-    model = genai.GenerativeModel('gemini-pro')
-    prompt = (f"Assume the user is a Computer Engineering student, the user is going to provide you with their career "
-              f"goals, prepare a 5-step program to help the user achieve their goals. Only give titles of each step, do not give "
-              f"any further details. {user_question} This is the user's level of experience: {user_experience}.")
-    response_gemini = model.generate_content(prompt)
-    response_gemini = response_gemini.text.replace('**', '').replace('*', '•')
-    return response_gemini
+# def ask_gemini(user_question, user_experience):
+#     model = genai.GenerativeModel('gemini-pro')
+#     prompt = (f"Assume the user is a Computer Engineering student, the user is going to provide you with their career "
+#               f"goals, prepare a 5-step program to help the user achieve their goals. Only give titles of each step, do not give "
+#               f"any further details. {user_question} This is the user's level of experience: {user_experience}.")
+#     response_gemini = model.generate_content(prompt)
+#     response_gemini = response_gemini.text.replace('**', '').replace('*', '•')
+#     return response_gemini
 
-def format_response(response):
-    lines = response.split('•')
-    lines = [line.strip() for line in lines if line.strip()]
-    formatted_response = '\n'.join(lines)
-    return formatted_response
+# def format_response(response):
+#     lines = response.split('•')
+#     lines = [line.strip() for line in lines if line.strip()]
+#     formatted_response = '\n'.join(lines)
+#     return formatted_response
 
-def elaborate_step(step_title):
-    prompt = f"Based on this step: {step_title}, elaborate on how to achieve this step. Keep it short and precise."
-    model = genai.GenerativeModel('gemini-pro')
-    response_gemini = model.generate_content(prompt)
-    response_gemini = response_gemini.text.replace('**', '').replace('*', '•')
-    return response_gemini
+# def elaborate_step(step_title):
+#     prompt = f"Based on this step: {step_title}, elaborate on how to achieve this step. Keep it short and precise."
+#     model = genai.GenerativeModel('gemini-pro')
+#     response_gemini = model.generate_content(prompt)
+#     response_gemini = response_gemini.text.replace('**', '').replace('*', '•')
+#     return response_gemini
+
+# @app.route('/api/flowchart', methods=['POST'])
+# def generate_flowchart():
+#     data = request.json
+#     user_question = data.get('career_choice')
+#     user_experience = data.get('experience')
+
+#     raw_gemini_response = ask_gemini(user_question, user_experience)
+#     formatted_gemini_response = format_response(raw_gemini_response)
+
+#     steps = formatted_gemini_response.split('\n')
+#     detailed_responses = [elaborate_step(step) for step in steps]
+
+#     return jsonify({
+#         'original_response': raw_gemini_response,
+#         'steps': detailed_responses
+#     })
+
+
+
+
 
 @app.route('/api/flowchart', methods=['POST'])
-def generate_flowchart():
+def roadmap():
     data = request.json
     user_question = data.get('career_choice')
     user_experience = data.get('experience')
+    steps = mainsteps(user_question, user_experience)
 
-    raw_gemini_response = ask_gemini(user_question, user_experience)
-    formatted_gemini_response = format_response(raw_gemini_response)
+    step1e = elaborate(steps['Step 1'])
+    step2e = elaborate(steps['Step 2'])
+    step3e = elaborate(steps['Step 3'])
+    step4e = elaborate(steps['Step 4'])
+    step5e = elaborate(steps['Step 5'])
 
-    steps = formatted_gemini_response.split('\n')
-    detailed_responses = [elaborate_step(step) for step in steps]
+    tech = techstack(user_question)
 
-    return jsonify({
-        'original_response': raw_gemini_response,
-        'steps': detailed_responses
-    })
+    print(steps['Step 1'], step1e, steps['Step 2'], step2e,steps['Step 3'], step3e,steps['Step 4'], step4e, steps['Step 5'], step5e)
+    return jsonify(step1=steps['Step 1'], step1e=step1e, step2=steps['Step 2'], step2e=step2e,step3=steps['Step 3'], step3e=step3e,step4=steps['Step 4'], step4e=step4e, step5=steps['Step 5'], step5e=step5e, tech = tech)
+
+
+
+def elaborate(step_title):
+    response2 = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": f"Based on this step: {step_title}, elaborate on how to achieve this step in paragraph. Keep it short and precise."},
+        
+    ]
+    )
+
+
+    return response2.choices[0].message.content
+
+
+def mainsteps(user_question, user_experience):
+    response = client.chat.completions.create(
+    model="gpt-3.5-turbo-0125",
+    response_format={ "type": "json_object" },
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
+        {"role": "system", "content": "Always follow this format (Step 1: first step, Step 2: second step, )"},
+        {"role": "user", "content": f"Assume the user is a Computer Engineering student, the user is going to provide you with their career "
+                f"goals, prepare a roadmap to help the user achieve their goals in 5 steps. Only give titles of each step, do not give "
+                f"any further details. {user_question} This is the user's level of experience: {user_experience}."}
+    ]
+    )
+
+    answer = response.choices[0].message.content
+
+    json_data = json.loads(answer)
+
+    return json_data
+
+
+def techstack(role):
+    response3 = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": f"Based on this role: {role}, give Techstack for the role."},
+        
+    ]
+    )
+
+    return response3.choices[0].message.content
 
 
 

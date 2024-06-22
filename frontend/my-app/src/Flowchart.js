@@ -25,7 +25,7 @@ const Flowchart = () => {
 
     return (
       <div>
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4 bg-white rounded-md shadow-md mb-8">
+      <form onSubmit={handleSubmit} className="max-w-md mx-auto items-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
           <div className="mb-4">
               <label className="block text-gray-700 font-bold mb-2">Career Choice:</label>
               <input

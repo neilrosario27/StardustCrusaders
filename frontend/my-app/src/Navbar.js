@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { FaSitemap, FaFileAlt, FaCentercode, FaCalendarAlt, FaQuora, FaHome } from 'react-icons/fa';
+import { FaSitemap, FaFileAlt, FaCentercode, FaCalendarAlt, FaQuora, FaHome, FaYoutube } from 'react-icons/fa';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -27,7 +27,7 @@ const Navbar = () => {
           <li>
             <NavLink to="/flowchart" className="sidebar-button" activeClassName="active" onClick={closeSidebar}>
               <FaSitemap className="icon" />
-              Flowchart
+              Roadmap
             </NavLink>
           </li>
           <li>
@@ -55,7 +55,13 @@ const Navbar = () => {
             </a>
           </li>
           <li>
-            <button className="sidebar-button" onClick={closeSidebar}>4</button>
+            <a href="/tutorials" className="sidebar-button" onClick={closeSidebar}>
+              <FaYoutube className="icon" />
+              Tutorials
+            </a>
+          </li>
+          <li>
+            <button className="sidebar-button" onClick={closeSidebar}>Interview Simulator</button>
           </li>
         </ul>
       </nav>
@@ -65,7 +71,8 @@ const Navbar = () => {
           <div className="bar"></div>
           <div className="bar"></div>
         </button>
-        <h1 className="app-title">App Title</h1>
+        <h1 className="app-title">CareerCraft
+        </h1>
       </div>
     </div>
   );

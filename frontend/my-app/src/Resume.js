@@ -75,7 +75,7 @@ const Resume = () => {
         {response && (
           <div className="mt-6 w-full p-6 bg-white rounded-md shadow-md">
             <h2 className="text-lg font-semibold text-gray-900">Response:</h2>
-            <p className="mt-4 text-gray-600"><strong>Job Description Suggestions:</strong> {response.jds}</p>
+            <p className="mt-4 text-gray-600"><strong>Job Description Score:</strong> {response.jds}</p>
             <p className="my-4 text-gray-600"><strong>Missing Keywords:</strong> {response.missing}</p>
             <p className="mb-4 text-gray-600"><strong>Summary:</strong> {response.summary}</p>
           </div>

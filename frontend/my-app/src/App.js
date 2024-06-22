@@ -4,6 +4,7 @@ import Navbar from "./Navbar";
 import Flowchart from "./Flowchart";
 import Resume from "./Resume";
 import Questions from "./Questions";
+import Tutorials from "./Tutorials";
 
 function App() {
   return (
@@ -20,6 +21,10 @@ function App() {
         </Routes>
         <Routes>
           <Route path="/questions" element={<Questions />} />
+          {/* Add more routes here */}
+        </Routes>
+        <Routes>
+          <Route path="/tutorials" element={<Tutorials />} />
           {/* Add more routes here */}
         </Routes>
       </div>

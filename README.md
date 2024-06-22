@@ -1,6 +1,6 @@
 
 # Flowchart
-
+*PORT : 3000*
 
 1. Navigate to the project directory:
     ```sh
@@ -25,6 +25,7 @@
 
 
 # Calendar
+*PORT : 3001*
 
 
 1. Navigate to the project directory:
@@ -49,6 +50,7 @@
 
 
 # Quiz
+*PORT : 5100*
 
 
 1. Navigate to the project directory:
@@ -69,6 +71,7 @@
     ```
 
 # Interview
+*PORT : 3002*
 
 
 1. Navigate to the project directory:
@@ -87,6 +90,8 @@
     ```sh
     npm run dev
     ```
+
+
 
 
 

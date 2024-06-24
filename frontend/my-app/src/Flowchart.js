@@ -22,13 +22,13 @@ const Flowchart = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
       <form
         onSubmit={handleSubmit}
-        className="max-w-md mx-auto items-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8"
+        className="max-w-md w-full bg-gray-700 bg-opacity-75 p-8 rounded-lg shadow-lg text-black mt-8"
       >
         <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2">
+          <label className="block text-black font-bold mb-2">
             Career Choice:
           </label>
           <input
@@ -39,7 +39,7 @@ const Flowchart = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2">
+          <label className="block text-black font-bold mb-2">
             Experience:
           </label>
           <input

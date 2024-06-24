@@ -31,56 +31,88 @@ const Resume = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h1 className="text-center text-4xl font-extrabold text-gray-900">Smart ATS</h1>
-          <p className="mt-2 text-center text-sm text-gray-600">Improve Your Resume ATS</p>
-        </div>
-        <form className="mt-4 space-y-6" onSubmit={handleSubmit} encType="multipart/form-data">
+    <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-start pt-16">
+      <div className="max-w-md w-full bg-gray-700 bg-opacity-75 p-8 rounded-lg shadow-lg text-white mt-8">
+        <h1 className="text-center text-4xl font-extrabold text-white">
+          Smart ATS
+        </h1>
+        <p className="mt-2 text-center text-sm text-white">
+          Improve Your Resume ATS
+        </p>
+
+        <form
+          className="mt-4 space-y-6"
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+        >
           <div>
-            <label htmlFor="jd" className="block text-gray-700 font-bold mb-2">Job Description:</label>
+            <label htmlFor="jd" className="block text-white font-bold mb-2">
+              Job Description:
+            </label>
             <textarea
               id="jd"
               name="jd"
               rows="4"
-              className="appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-black placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               placeholder="Paste the Job Description"
               value={jd}
               onChange={(e) => setJd(e.target.value)}
               required
             ></textarea>
           </div>
+
           <div className="mt-4">
-            <label htmlFor="uploaded_file" className="block text-gray-700 font-bold mb-2">Resume:</label>
-            <input
-              type="file"
-              id="uploaded_file"
-              name="uploaded_file"
-              accept=".pdf"
-              className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              onChange={handleFileChange}
-              required
-            />
+            <label
+              htmlFor="uploaded_file"
+              className="block text-white font-bold mb-2"
+            >
+              Resume:
+            </label>
+            <div className="flex items-center justify-between bg-gray-700 border border-gray-300 rounded-lg cursor-pointer px-4 py-2 focus-within:ring-2 focus-within:ring-indigo-500">
+              <span className="text-gray-300">Upload a PDF file</span>
+              <input
+                type="file"
+                id="uploaded_file"
+                name="uploaded_file"
+                accept=".pdf"
+                className="hidden"
+                onChange={handleFileChange}
+                required
+              />
+              <label
+                htmlFor="uploaded_file"
+                className="text-white bg-blue-500 px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer"
+              >
+                Choose File
+              </label>
+            </div>
           </div>
+
           <div>
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700"
+              className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
             >
               Submit
             </button>
           </div>
         </form>
-        {response && (
-          <div className="mt-6 w-full p-6 bg-white rounded-md shadow-md">
-            <h2 className="text-lg font-semibold text-gray-900">Response:</h2>
-            <p className="mt-4 text-gray-600"><strong>Job Description Score:</strong> {response.jds}</p>
-            <p className="my-4 text-gray-600"><strong>Missing Keywords:</strong> {response.missing}</p>
-            <p className="mb-4 text-gray-600"><strong>Summary:</strong> {response.summary}</p>
-          </div>
-        )}
       </div>
+
+      {response && (
+        <div className="mt-8 max-w-md w-full bg-white p-6 rounded-md shadow-md text-black">
+          <h2 className="text-lg font-semibold">Response:</h2>
+          <p className="mt-4">
+            <strong>Job Description Suggestions:</strong> {response.jds}
+          </p>
+          <p className="my-4">
+            <strong>Missing Keywords:</strong> {response.missing}
+          </p>
+          <p className="mb-4">
+            <strong>Summary:</strong> {response.summary}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

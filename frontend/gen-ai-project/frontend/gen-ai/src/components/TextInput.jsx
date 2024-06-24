@@ -50,7 +50,7 @@ const TextInput = ({ updateTextValue }) => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           className="flex-1 p-2 border border-gray-300 rounded bg-white"
-          placeholder="What do you wanna know.."
+          placeholder="Begin conversation..."
         />
         <input
           type="text"
